@@ -448,6 +448,8 @@
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
     <button class="tab-btn" onclick="switchTab('log')">Full Log</button>
+    <button class="tab-btn" onclick="switchTab('weight')">Weight</button>
+    <button class="tab-btn" onclick="switchTab('nudes')">Nudes</button>
     <button class="tab-btn" onclick="switchTab('upload')">Update</button>
   </div>
   <div class="nav-meta" id="nav-meta">—</div>
@@ -474,15 +476,20 @@
         <div class="stat-sub" id="stat-latest-sub">—</div>
       </div>
       <div class="stat-card">
+        <div class="stat-label">Current Weight</div>
+        <div class="stat-value" id="stat-current-weight">—</div>
+        <div class="stat-sub" id="stat-weight-sub">log a weigh-in</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Goal Weight</div>
+        <div class="stat-value" style="color:var(--accent)">sub 200</div>
+        <div class="stat-sub" id="stat-to-go">— lbs to go</div>
+      </div>
+      <div class="stat-card">
         <div class="stat-label">Injury Flags</div>
         <div class="stat-value" id="stat-injuries" style="color: var(--red)">0</div>
         <div class="stat-sub">notes mentioning pain</div>
       </div>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">Exercises per Day</div>
-      <div class="bar-chart" id="bar-chart"></div>
     </div>
 
     <div class="section-header">
@@ -510,6 +517,89 @@
         </thead>
         <tbody id="log-tbody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- WEIGHT TAB -->
+  <div class="panel" id="panel-weight">
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:32px">
+      <div class="stat-card">
+        <div class="stat-label">Starting Weight</div>
+        <div class="stat-value" id="w-start">—</div>
+        <div class="stat-sub" id="w-start-date">not set</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Current Weight</div>
+        <div class="stat-value" id="w-current">—</div>
+        <div class="stat-sub" id="w-current-date">not set</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Lost</div>
+        <div class="stat-value" id="w-lost" style="color:var(--green)">—</div>
+        <div class="stat-sub">lbs since start</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">To Goal (sub 200)</div>
+        <div class="stat-value" id="w-togo" style="color:var(--accent)">—</div>
+        <div class="stat-sub">lbs remaining</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Log Weigh-In</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="chart-wrap" style="max-width:480px">
+      <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap">
+        <div>
+          <div class="stat-label" style="margin-bottom:8px">Date</div>
+          <input type="date" id="w-date-input" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;outline:none"/>
+        </div>
+        <div>
+          <div class="stat-label" style="margin-bottom:8px">Weight (lbs)</div>
+          <input type="number" id="w-lbs-input" placeholder="215" min="100" max="400" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;width:120px;outline:none"/>
+        </div>
+        <button onclick="addWeighIn()" style="background:var(--accent);color:#000;border:none;padding:10px 24px;border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-weight:600">Log It</button>
+      </div>
+    </div>
+
+    <div class="section-header" style="margin-top:32px">
+      <div class="section-title">Weigh-In History</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="log-table-wrap">
+      <table class="log-table">
+        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th></th></tr></thead>
+        <tbody id="weight-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NUDES TAB -->
+  <div class="panel" id="panel-nudes">
+    <div class="section-header">
+      <div class="section-title">Progress Photos</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div id="photo-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+
+    <div id="photo-empty" style="text-align:center;padding:80px 24px;color:var(--muted)">
+      <div style="font-size:48px;margin-bottom:16px">📸</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#333;margin-bottom:12px">No Photos Yet</div>
+      <div style="font-size:13px;line-height:1.8;max-width:400px;margin:0 auto">
+        Drop photos in the <span style="color:var(--accent);font-family:'DM Mono',monospace">photos/</span> folder<br>
+        inside your Workout directory, then run:<br>
+        <span style="color:var(--accent);font-family:'DM Mono',monospace">python deploy.py --csv workouts.csv</span>
+      </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="closeLightbox()">
+      <img id="lightbox-img" style="max-width:90vw;max-height:80vh;border-radius:8px;object-fit:contain"/>
+      <div id="lightbox-label" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"></div>
     </div>
   </div>
 
@@ -649,23 +739,6 @@ function render(data) {
   document.getElementById('stat-injuries').textContent = injuryRows.length;
   document.getElementById('nav-meta').textContent = `Last updated: ${dates.length ? formatDate(dates[0]) : '—'}`;
 
-  // BAR CHART
-  const chartEl = document.getElementById('bar-chart');
-  chartEl.innerHTML = '';
-  const sortedDates = [...dates].sort((a,b) => new Date(a) - new Date(b));
-  const maxCount = Math.max(...sortedDates.map(d => byDate[d].length));
-  sortedDates.forEach(d => {
-    const count = byDate[d].length;
-    const pct = maxCount ? (count / maxCount) * 100 : 0;
-    const g = document.createElement('div');
-    g.className = 'bar-group';
-    g.innerHTML = `
-      <div class="bar-count">${count}</div>
-      <div class="bar" style="height:${Math.max(pct, 5)}%"></div>
-      <div class="bar-label">${shortDate(d)}</div>`;
-    chartEl.appendChild(g);
-  });
-
   // DAY CARDS
   const cardsEl = document.getElementById('day-cards');
   cardsEl.innerHTML = '';
@@ -782,8 +855,129 @@ zone.addEventListener('drop', e => {
   if (file) { const reader = new FileReader(); reader.onload = ev => render(parseCSV(ev.target.result)); reader.readAsText(file); }
 });
 
+// ── WEIGHT TRACKER ────────────────────────────────────────────────────
+let weighIns = JSON.parse(localStorage.getItem('weighIns') || '[]');
+const GOAL = 200;
+
+function saveWeighIns() { localStorage.setItem('weighIns', JSON.stringify(weighIns)); }
+
+function addWeighIn() {
+  const d = document.getElementById('w-date-input').value;
+  const lbs = parseFloat(document.getElementById('w-lbs-input').value);
+  if (!d || isNaN(lbs)) { alert('Enter a date and weight'); return; }
+  weighIns.push({ date: d, lbs });
+  weighIns.sort((a,b) => new Date(a.date) - new Date(b.date));
+  saveWeighIns();
+  renderWeight();
+  document.getElementById('w-lbs-input').value = '';
+}
+
+function deleteWeighIn(idx) {
+  weighIns.splice(idx, 1);
+  saveWeighIns();
+  renderWeight();
+}
+
+function renderWeight() {
+  const start = weighIns[0];
+  const current = weighIns[weighIns.length - 1];
+
+  document.getElementById('w-start').textContent = start ? start.lbs + ' lbs' : '—';
+  document.getElementById('w-start-date').textContent = start ? formatDate(start.date) : 'not set';
+  document.getElementById('w-current').textContent = current ? current.lbs + ' lbs' : '—';
+  document.getElementById('w-current-date').textContent = current ? formatDate(current.date) : 'not set';
+
+  const lost = start && current ? (start.lbs - current.lbs).toFixed(1) : null;
+  const toGo = current ? (current.lbs - GOAL).toFixed(1) : null;
+
+  document.getElementById('w-lost').textContent = lost !== null ? (lost > 0 ? lost + ' lbs' : '0') : '—';
+  document.getElementById('w-togo').textContent = toGo !== null ? (toGo > 0 ? toGo + ' lbs' : '✓ Done!') : '—';
+
+  // Update overview stats
+  if (document.getElementById('stat-current-weight')) {
+    document.getElementById('stat-current-weight').textContent = current ? current.lbs + ' lbs' : '—';
+    document.getElementById('stat-weight-sub').textContent = current ? 'as of ' + shortDate(current.date) : 'log a weigh-in';
+    document.getElementById('stat-to-go').textContent = toGo !== null && toGo > 0 ? toGo + ' lbs to go' : toGo <= 0 ? '✓ Goal reached!' : '— lbs to go';
+  }
+
+  // Table
+  const tbody = document.getElementById('weight-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  [...weighIns].reverse().forEach((w, i) => {
+    const realIdx = weighIns.length - 1 - i;
+    const prev = weighIns[realIdx - 1];
+    const delta = prev ? (w.lbs - prev.lbs).toFixed(1) : null;
+    const deltaStr = delta === null ? '—' : delta > 0
+      ? `<span style="color:var(--red)">+${delta}</span>`
+      : delta < 0 ? `<span style="color:var(--green)">${delta}</span>`
+      : '<span style="color:var(--muted)">0</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="date-cell">${formatDate(w.date)}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:24px">${w.lbs} lbs</td>
+      <td>${deltaStr}</td>
+      <td><button onclick="deleteWeighIn(${realIdx})" style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Set default date input to today
+  const today = new Date().toISOString().split('T')[0];
+  const di = document.getElementById('w-date-input');
+  if (di && !di.value) di.value = today;
+}
+
+// ── PROGRESS PHOTOS ───────────────────────────────────────────────────
+// This list is auto-updated by deploy.py when you push photos
+const PHOTO_FILES = ["Week1-Front.jpeg", "Week1-Side.jpeg"];
+
+const GITHUB_PHOTOS_BASE = "https://kyleshope02-bit.github.io/workout-log/photos/";
+
+function renderPhotos() {
+  const grid = document.getElementById('photo-grid');
+  const empty = document.getElementById('photo-empty');
+
+  if (!PHOTO_FILES.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  // Sort by week number extracted from filename (week1, week2 etc)
+  const sorted = [...PHOTO_FILES].sort((a, b) => {
+    const na = parseInt(a.match(/\d+/) || [0]);
+    const nb = parseInt(b.match(/\d+/) || [0]);
+    return nb - na; // newest first
+  });
+
+  grid.innerHTML = sorted.map((name, i) => {
+    const label = name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    const url = GITHUB_PHOTOS_BASE + name;
+    return `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;animation:fadeUp 0.4s ease ${i*0.05}s both" onclick="openLightbox('${url}','${label}')">
+        <img src="${url}" style="width:100%;height:260px;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"/>
+        <div style="padding:14px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;text-transform:capitalize">${label}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openLightbox(url, label) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox-label').textContent = label;
+  lb.style.display = 'flex';
+}
+
+function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+
 // ── INIT ──────────────────────────────────────────────────────────────
 render(parseCSV(EMBEDDED_CSV));
+renderWeight();
+renderPhotos();
 </script>
 </body>
 </html>
