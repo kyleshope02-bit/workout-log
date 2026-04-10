@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kyle — Training Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #666;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { color: var(--text); background: var(--surface2); }
+  .tab-btn.active { color: var(--accent); background: var(--surface2); }
+
+  .nav-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* MAIN */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* TAB PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* HERO STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    margin-top: 32px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* LOG TABLE */
+  .log-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .log-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 20px;
+    text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .log-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  .log-table tr:last-child td { border-bottom: none; }
+
+  .log-table tr:hover td { background: var(--surface2); }
+
+  .date-cell {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .exercise-cell {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .notes-cell {
+    color: #aaa;
+    font-size: 13px;
+    max-width: 500px;
+    line-height: 1.5;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .tag-warmup { background: rgba(232,255,71,0.1); color: var(--accent); border: 1px solid rgba(232,255,71,0.2); }
+  .tag-strength { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+  .tag-conditioning { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+  .tag-accessory { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+
+  /* DAY CARDS (Overview) */
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .day-date {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    min-width: 100px;
+  }
+
+  .day-exercises {
+    font-size: 13px;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  .day-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .day-body {
+    padding: 0;
+  }
+
+  .day-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    align-items: start;
+  }
+
+  .day-row:last-child { border-bottom: none; }
+
+  .day-row-exercise {
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .day-row-notes {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.6;
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 32px;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(232,255,71,0.03); }
+
+  .upload-icon { font-size: 36px; margin-bottom: 12px; }
+
+  .upload-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .upload-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  #csv-input { display: none; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: rgba(232,255,71,0.1); border-color: var(--accent); color: var(--accent); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--muted);
+  }
+
+  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: #333; margin-bottom: 8px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CHART */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+    min-height: 4px;
+    transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0.85;
+  }
+
+  .bar:hover { opacity: 1; }
+
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .bar-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  /* INJURY / FLAG */
+  .flag-injury { color: var(--red); font-size: 12px; }
+
+  /* MOBILE */
+  @media (max-width: 640px) {
+    nav { padding: 14px 16px; }
+    .nav-brand { font-size: 22px; }
+    .tab-btn { padding: 6px 10px; font-size: 10px; }
+    main { padding: 20px 12px; }
+    .day-row { grid-template-columns: 1fr; gap: 8px; }
+    .day-row-notes { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 8px; }
+    .stat-value { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">TRAINING LOG</div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="switchTab('log')">Full Log</button>
+    <button class="tab-btn" onclick="switchTab('upload')">Update</button>
+  </div>
+  <div class="nav-meta" id="nav-meta">—</div>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW TAB -->
+  <div class="panel active" id="panel-overview">
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Sessions</div>
+        <div class="stat-value" id="stat-sessions">0</div>
+        <div class="stat-sub">workout days logged</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Exercises</div>
+        <div class="stat-value" id="stat-exercises">0</div>
+        <div class="stat-sub">across all sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Latest Session</div>
+        <div class="stat-value" id="stat-latest" style="font-size:24px; padding-top:8px;">—</div>
+        <div class="stat-sub" id="stat-latest-sub">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Injury Flags</div>
+        <div class="stat-value" id="stat-injuries" style="color: var(--red)">0</div>
+        <div class="stat-sub">notes mentioning pain</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Exercises per Day</div>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Recent Sessions</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div id="day-cards"></div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div class="panel" id="panel-log">
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" onclick="filterLog('all', this)">All</button>
+    </div>
+    <div class="log-table-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Exercise</th>
+            <th>Category</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="log-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- UPLOAD TAB -->
+  <div class="panel" id="panel-upload">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('csv-input').click()">
+      <div class="upload-icon">📁</div>
+      <div class="upload-label">Drop new CSV or click to upload</div>
+      <div class="upload-sub">Replace data with updated workouts.csv</div>
+    </div>
+    <input type="file" id="csv-input" accept=".csv" onchange="handleFileUpload(event)"/>
+
+    <div class="section-header">
+      <div class="section-title">CSV Format</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Expected columns</div>
+      <table class="log-table">
+        <thead>
+          <tr><th>Column</th><th>Required</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="date-cell">date</td><td><span class="tag tag-strength">Yes</span></td><td class="notes-cell">4/9/2026 or 2026-04-09</td></tr>
+          <tr><td class="date-cell">exercise</td><td><span class="tag tag-strength">Yes</span></td><td class="notes-cell">Deadlift</td></tr>
+          <tr><td class="date-cell">notes</td><td><span class="tag tag-accessory">Optional</span></td><td class="notes-cell">Felt strong, hit 275x5</td></tr>
+          <tr><td class="date-cell">sets</td><td><span class="tag tag-accessory">Optional</span></td><td class="notes-cell">5</td></tr>
+          <tr><td class="date-cell">reps</td><td><span class="tag tag-accessory">Optional</span></td><td class="notes-cell">3</td></tr>
+          <tr><td class="date-cell">weight_lbs</td><td><span class="tag tag-accessory">Optional</span></td><td class="notes-cell">275</td></tr>
+          <tr><td class="date-cell">rpe</td><td><span class="tag tag-accessory">Optional</span></td><td class="notes-cell">8</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── EMBEDDED DATA (auto-updated on upload) ──────────────────────────
+const EMBEDDED_CSV = `﻿date,exercise,notes
+4/6/2026,Warmup,"Foam Roller Stuff. Felt good, I should do this more. I cant do remotely anything close to a cossack squat. Not possible with my body"
+4/6/2026,Goblet Squat,
+4/6/2026,Bulgarian split squat hold,"no weight, broke into smaller sets. Pain"
+4/7/2026,Shoulder warmup,Hang is major pain on right elbow
+4/7/2026,Bands,"Annoying to set up, but I like"
+4/7/2026,DB bench,Felt good with neutral grip. Ended at 75 lbs. 
+4/7/2026,Super Set w. Dips,Need to weight assisted. Super Set is tough
+4/7/2026,Skull Crushers / pullovers,"Didn’t get to do the bench. Probably  a bit too much volume, boss was pinging me"
+4/8/2026,Warmup,Didn’t do much tbh. We have a standard I can follow?
+4/8/2026,Bands,Actually tough with pull downs and super set
+4/8/2026,Assault Bike,
+4/9/2026,Warmup,Like the halo rotations
+4/9/2026,"Barbell Rows, Curls, pulls",No shot I can high pull 45 after all that shit. Shoulders and that movement specifically are weak. 
+4/9/2026,Rows w/ Bar,Meh. Was a bitch and not super focused
+4/9/2026,Bi Superset,"Solid, feeling the pump"
+`;
+
+// ── CATEGORY DETECTION ───────────────────────────────────────────────
+const PAIN_WORDS = ['pain','hurt','ache','injury','injured','sore','elbow','shoulder','impingement','tweak'];
+const WARMUP_WORDS = ['warmup','warm-up','foam','stretch','mobility','halo','band'];
+const CONDITIONING_WORDS = ['bike','assault','row','run','cardio','conditioning','rower'];
+const STRENGTH_WORDS = ['deadlift','squat','bench','press','barbell','row','pull','curl','dip','skull','goblet','bulgarian','split'];
+
+function categorize(exercise, notes) {
+  const str = (exercise + ' ' + (notes||'')).toLowerCase();
+  if (WARMUP_WORDS.some(w => str.includes(w))) return 'warmup';
+  if (CONDITIONING_WORDS.some(w => str.includes(w))) return 'conditioning';
+  if (STRENGTH_WORDS.some(w => str.includes(w))) return 'strength';
+  return 'accessory';
+}
+
+function hasPain(text) {
+  return PAIN_WORDS.some(w => (text||'').toLowerCase().includes(w));
+}
+
+// ── CSV PARSER ───────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].replace(/^\uFEFF/, '').split(',').map(h => h.trim().toLowerCase());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    if (cols.length < 2) continue;
+    const obj = {};
+    headers.forEach((h, idx) => obj[h] = (cols[idx]||'').trim().replace(/^"|"$/g,''));
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQuote = !inQuote; }
+    else if (line[i] === ',' && !inQuote) { result.push(cur); cur = ''; }
+    else { cur += line[i]; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function formatDate(d) {
+  const date = new Date(d);
+  if (isNaN(date)) return d;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function shortDate(d) {
+  const date = new Date(d);
+  if (isNaN(date)) return d;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────
+let allData = [];
+let currentFilter = 'all';
+
+function render(data) {
+  allData = data;
+
+  // Group by date
+  const byDate = {};
+  data.forEach(r => {
+    if (!byDate[r.date]) byDate[r.date] = [];
+    byDate[r.date].push(r);
+  });
+
+  const dates = Object.keys(byDate).sort((a,b) => new Date(b) - new Date(a));
+
+  // STATS
+  const injuryRows = data.filter(r => hasPain(r.notes) || hasPain(r.exercise));
+  document.getElementById('stat-sessions').textContent = dates.length;
+  document.getElementById('stat-exercises').textContent = data.length;
+  document.getElementById('stat-latest').textContent = dates.length ? shortDate(dates[0]) : '—';
+  document.getElementById('stat-latest-sub').textContent = dates.length ? `${byDate[dates[0]].length} exercises` : '';
+  document.getElementById('stat-injuries').textContent = injuryRows.length;
+  document.getElementById('nav-meta').textContent = `Last updated: ${dates.length ? formatDate(dates[0]) : '—'}`;
+
+  // BAR CHART
+  const chartEl = document.getElementById('bar-chart');
+  chartEl.innerHTML = '';
+  const sortedDates = [...dates].sort((a,b) => new Date(a) - new Date(b));
+  const maxCount = Math.max(...sortedDates.map(d => byDate[d].length));
+  sortedDates.forEach(d => {
+    const count = byDate[d].length;
+    const pct = maxCount ? (count / maxCount) * 100 : 0;
+    const g = document.createElement('div');
+    g.className = 'bar-group';
+    g.innerHTML = `
+      <div class="bar-count">${count}</div>
+      <div class="bar" style="height:${Math.max(pct, 5)}%"></div>
+      <div class="bar-label">${shortDate(d)}</div>`;
+    chartEl.appendChild(g);
+  });
+
+  // DAY CARDS
+  const cardsEl = document.getElementById('day-cards');
+  cardsEl.innerHTML = '';
+  dates.forEach((d, i) => {
+    const rows = byDate[d];
+    const exerciseNames = rows.map(r => r.exercise).join(' · ');
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+
+    const bodyRows = rows.map(r => {
+      const cat = categorize(r.exercise, r.notes);
+      const pain = hasPain(r.notes) || hasPain(r.exercise);
+      return `<div class="day-row">
+        <div class="day-row-exercise">
+          <span class="tag tag-${cat}">${cat}</span>
+          <span style="margin-top:4px">${r.exercise}</span>
+          ${pain ? '<span class="flag-injury">⚠ pain/injury noted</span>' : ''}
+        </div>
+        <div class="day-row-notes">${r.notes || '<span style="color:#333">no notes</span>'}</div>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="day-header" onclick="toggleCard(this)">
+        <div class="day-date">${shortDate(d)}</div>
+        <div class="day-exercises">${exerciseNames}</div>
+        <div class="day-count">${rows.length} exercises ▾</div>
+      </div>
+      <div class="day-body">${bodyRows}</div>`;
+    cardsEl.appendChild(card);
+  });
+
+  // LOG TABLE + FILTERS
+  buildLogTable(data, currentFilter);
+
+  // Filter buttons
+  const categories = ['all', 'warmup', 'strength', 'conditioning', 'accessory'];
+  const filterBar = document.getElementById('filter-bar');
+  filterBar.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (cat === currentFilter ? ' active' : '');
+    btn.textContent = cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.onclick = () => filterLog(cat, btn);
+    filterBar.appendChild(btn);
+  });
+}
+
+function buildLogTable(data, filter) {
+  const tbody = document.getElementById('log-tbody');
+  tbody.innerHTML = '';
+  const filtered = filter === 'all' ? data : data.filter(r => categorize(r.exercise, r.notes) === filter);
+  
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted)">No entries</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(r => {
+    const cat = categorize(r.exercise, r.notes);
+    const pain = hasPain(r.notes) || hasPain(r.exercise);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="date-cell">${shortDate(r.date)}</td>
+      <td class="exercise-cell">${r.exercise}${pain ? ' <span class="flag-injury">⚠</span>' : ''}</td>
+      <td><span class="tag tag-${cat}">${cat}</span></td>
+      <td class="notes-cell">${r.notes || '—'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterLog(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildLogTable(allData, cat);
+}
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const data = parseCSV(ev.target.result);
+    render(data);
+    switchTab('overview');
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+  };
+  reader.readAsText(file);
+}
+
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) { const reader = new FileReader(); reader.onload = ev => render(parseCSV(ev.target.result)); reader.readAsText(file); }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────
+render(parseCSV(EMBEDDED_CSV));
+</script>
+</body>
+</html>
